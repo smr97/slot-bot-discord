@@ -1,4 +1,5 @@
 import csv
+import os
 import re
 import asyncio
 from _datetime import timedelta
@@ -34,6 +35,11 @@ class Record:
 class FoundRecord(Record):
     def __init__(self, username, location, date):
         super().__init__(username=username, location=location, date=date)
+
+    def __str__(self):
+        return (
+            f"{self.username} found an interview slot at {self.location} on {self.date}"
+        )
 
 
 class NotFoundRecord(Record):
@@ -109,3 +115,19 @@ class MessageStore:
                     rec.write_to_csv(csvhandle)
                 except asyncio.QueueEmpty:
                     break
+
+    def query_slots(self):
+        if not self.found_queue.empty():
+            records = [_s for _s in self.found_queue._queue]
+        else:
+            today = datetime.date.today().strftime("%d_%m_%y")
+            with open(f"SlotsFound_{today}.csv", "r") as csvhandle:
+                rows = csv.reader(csvhandle)
+                records = [FoundRecord(_r[0], _r[1], _r[2]) for _r in rows]
+        return records
+
+    def get_all_files(self):
+        all_files = [open(_f, "rb") for _f in os.listdir(".") if "SlotsFound" in _f]
+        return all_files
+
+
