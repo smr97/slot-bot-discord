@@ -31,6 +31,9 @@ If you haven't found any slot yet, just type in one message PER SEARCH that you 
     tried {location} on DD/MM/YY
 """
 
+query_regex = re.compile(".*(find|are\s+there|found)?\s*(any)\s+(interview)?\s*(slot)(s)?.*")
+archive_str = ["show all files"]
+
 
 @client.event
 async def on_message(message):
@@ -42,6 +45,16 @@ async def on_message(message):
     message.content = message.content.lower()
     if any(message.content.startswith(s) for s in salutations):
         await message.channel.send(f"Hi {message.author}, {usage}")
+        return
+    elif query_regex.match(message.content) is not None:
+        records = client.msg_store.query_slots()
+        await message.channel.send(f"Checking my log...")
+        for _r in records:
+            await message.channel.send(f"{_r}")
+        return
+    elif any(_a in message.content for _a in archive_str):
+        files = client.msg_store.get_all_files()
+        await message.channel.send(files=list(map(lambda f: discord.File(f), files)))
         return
     status = client.msg_store.enqueue_message(
         message.content, str(message.author).split("#")[0]
@@ -70,7 +83,9 @@ async def on_error(some_event, *its_args, **kwargs):
             orig_message = _s
             break
 
-    print(f"Caught {extype} {value.base_exception if hasattr(value, 'base_exception') else None}: {traceback}")
+    print(
+        f"Caught {extype} {value.base_exception if hasattr(value, 'base_exception') else None}: {traceback}"
+    )
     if isinstance(value, LocationError):
         await orig_message.channel.send(
             "Couldn't figure out the location, please try again, ask for help maybe?"
@@ -83,6 +98,11 @@ async def on_error(some_event, *its_args, **kwargs):
         await orig_message.channel.send(
             "Didn't understand whether you found a slot or not. If you did, type 'got <location> on DD/MM/YY"
         )
+    elif isinstance(value, FileNotFoundError):
+        await orig_message.channel.send(
+            "No slots were found today. Ask for archive files to see all previous records."
+        )
+
     else:
         await orig_message.channel.send(
             "Didn't get you, please ask for help and try again. Else, report a bug to smr97"
