@@ -127,7 +127,7 @@ class MessageStore:
         return records
 
     def get_all_files(self):
-        all_files = [open(_f, "rb") for _f in os.listdir(".") if "SlotsFound" in _f]
+        all_files = [open(_f, "rb") for _f in os.listdir(".") if "Slots" in _f]
         return all_files
 
 

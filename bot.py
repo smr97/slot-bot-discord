@@ -31,7 +31,7 @@ If you haven't found any slot yet, just type in one message PER SEARCH that you 
     tried {location} on DD/MM/YY
 """
 
-query_regex = re.compile(".*(find|are\s+there|found)?\s*(any)\s+(interview)?\s*(slot)(s)?.*")
+query_regex = re.compile(".*(find|are\s+there|found)?\s*(any|a)\s+(interview)?\s*(slot)(s)?.*")
 archive_str = ["show all files"]
 
 
@@ -51,6 +51,8 @@ async def on_message(message):
         await message.channel.send(f"Checking my log...")
         for _r in records:
             await message.channel.send(f"{_r}")
+        else:
+            await message.channel.send("No")
         return
     elif any(_a in message.content for _a in archive_str):
         files = client.msg_store.get_all_files()
