@@ -29,6 +29,8 @@ If you were lucky enough to get a slot, just type in the following message PER S
     got {location} on DD/MM/YY.
 If you haven't found any slot yet, just type in one message PER SEARCH that you made, in the following manner:
     tried {location} on DD/MM/YY
+
+In all cases, write the date that you searched for. If you didn't find any slot, then the bot assumes that there are no slots for the 15 day period following the date in the message.
 """
 
 query_regex = re.compile(".*(find|are\s+there|found)?\s*(any|a)\s+(interview)?\s*(slot)(s)?.*")
