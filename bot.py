@@ -43,7 +43,7 @@ async def on_message(message):
         message.guild is not None
         and (
             client.user not in message.mentions
-            and any(_r.name != client.user.name for _r in message.role_mentions)
+            and not any(_r.name == client.user.name for _r in message.role_mentions)
         )
     ):
         return
