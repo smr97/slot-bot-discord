@@ -33,14 +33,20 @@ If you haven't found any slot yet, just type in one message PER SEARCH that you 
 In all cases, write the date that you searched for. If you didn't find any slot, then the bot assumes that there are no slots for the 15 day period following the date in the message.
 """
 
-query_regex = re.compile(".*(find|are\s+there|found)?\s*(any|a)\s+(interview)?\s*(slot)(s)?.*")
+query_regex = re.compile(
+    ".*(find|are\s+there|found)?\s*(any|a)\s+(interview)?\s*(slot)(s)?.*"
+)
 archive_str = ["show all files"]
 
 
 @client.event
 async def on_message(message):
     if message.author == client.user or (
-        message.guild is not None and client.user not in message.mentions
+        message.guild is not None
+        and (
+            client.user not in message.mentions
+            and any(_r.name != client.user.name for _r in message.role_mentions)
+        )
     ):
         return
     print(f"Got message {message.content} from {message.author}")
